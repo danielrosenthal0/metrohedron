@@ -1,0 +1,50 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  auth0Id       String    @unique
+  email         String    @unique
+  name          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  trips         Trip[]
+  favoriteLines Line[]
+}
+
+model Trip {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lineId        String
+  line          Line      @relation(fields: [lineId], references: [id])
+  startStation  String
+  endStation    String
+  startTime     DateTime
+  endTime       DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Line {
+  id            String    @id @default(uuid())
+  name          String    @unique
+  color         String
+  trips         Trip[]
+  users         User[]    // Users who have this as favorite
+}
+
+// Seed with NYC subway lines
+model Station {
+  id            String    @id @default(uuid())
+  name          String
+  lines         String[]  // Array of line names that serve this station
+}
