@@ -1,0 +1,8 @@
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: metrohedron
+      POSTGRES_HOST_AUTH_METHOD: trust
