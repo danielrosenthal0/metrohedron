@@ -1,9 +1,20 @@
-import { auth0 } from "@/lib/auth0";
-// pages/index.js
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
-export default async function Home() {
-  const session = await auth0.getSession();
+export default function Home() {
+  const [session, setSession] = useState<{ user?: { name?: string } } | null>(null);
 
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((data) => {
+        setSession(data);
+        if (data && data.user) {
+          fetch("/api/auth/post-login", { method: "POST" });
+        }
+      });
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -13,17 +24,17 @@ export default async function Home() {
           <nav>
             {session && session.user ? (
               <div className="flex items-center space-x-4">
-                <a href="/profile" className="hover:underline">
+                <Link href="/profile" className="hover:underline">
                   Profile
-                </a>
-                <a href="/auth/logout" className="bg-blue-700 px-4 py-2 rounded hover:bg-blue-800">
+                </Link>
+                <Link href="/auth/logout" className="bg-blue-700 px-4 py-2 rounded hover:bg-blue-800">
                   Logout
-                </a>
+                </Link>
               </div>
             ) : (
-              <a href="/auth/login" className="bg-blue-700 px-4 py-2 rounded hover:bg-blue-800">
+              <Link href="/auth/login" className="bg-blue-700 px-4 py-2 rounded hover:bg-blue-800">
                 Login
-              </a>
+              </Link>
             )}
           </nav>
         </div>
@@ -34,17 +45,17 @@ export default async function Home() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4 text-black">Hi, {session.user.name}!</h2>
             <p className="mb-4 text-black">Track your NYC subway journeys.</p>
-            <a href="/log-trip" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+            <Link href="/log-trip" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
               Log a Trip
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4 text-black">metrohedron</h2>
             <p className="mb-4 text-black">Sign in to start tracking subway journeys.</p>
-            <a href="/auth/login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            <Link href="/auth/login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
               Get Started
-            </a>
+            </Link>
           </div>
         )}
       </main>
