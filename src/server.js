@@ -11,11 +11,11 @@ app.get('/users', async (req, res) => {
   res.json(users);
 });
 
-app.get('/user/:id', async (req, res) => {
-  const { id } = req.params;
+app.get('/user/:auth0Id', async (req, res) => {
+  const { auth0Id } = req.params;
   try {
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { auth0Id },
       include: {
         trips: true,
         favoriteLines: true,
