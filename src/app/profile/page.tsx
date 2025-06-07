@@ -1,5 +1,5 @@
+import TopNavBar from "@/components/TopNavBar";
 import { auth0 } from "@/lib/auth0";
-import Link from "next/link";
 
 async function getUserData(auth0Id: string) {
   console.log("Fetching user data for auth0Id:", auth0Id);
@@ -15,22 +15,10 @@ export default async function Profile() {
     userData = await getUserData(session.user.sub);
   }
   return (
+    
     <div className="min-h-screen bg-gray-100">
+      <TopNavBar />
 
-      <header className="bg-slate-600 text-white p-4">
-        <div className="container mx-auto flex justify-between items-center">
-
-          <h1 className="text-2xl font-bold">metrohedron</h1>
-          <div className="flex items-center space-x-4">
-          <Link href="/" className="text-white hover:underline">
-            Home
-          </Link>
-          <Link href="/profile" className="text-white hover:underline">
-            Profile
-          </Link>
-          </div>
-        </div>
-      </header>
       <main className="container mx-auto p-4">
         {session && session.user ? (
           <div className="bg-white p-6 rounded-lg shadow-md">
