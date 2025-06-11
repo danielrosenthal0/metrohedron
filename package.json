@@ -12,10 +12,12 @@
     "@auth0/nextjs-auth0": "^4.5.1",
     "@prisma/client": "^6.7.0",
     "express": "^5.1.0",
+    "leaflet": "^1.9.4",
     "next": "15.3.2",
     "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-leaflet": "^5.0.0",
     "recharts": "^2.15.3"
   },
   "devDependencies": {

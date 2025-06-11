@@ -20,9 +20,15 @@ function AddTripModal({ isOpen, onClose, onSubmit, stations, lines }: { isOpen: 
   const [startStation, setStartStation] = useState("");
   const [endStation, setEndStation] = useState("");
   const [line, setLine] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
 
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+  const nowStr = `${todayStr}T${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
+  const [startTime, setStartTime] = useState(nowStr);
+  const [endTime, setEndTime] = useState("");
   if (!isOpen) return null;
 
   return (
@@ -66,11 +72,11 @@ function AddTripModal({ isOpen, onClose, onSubmit, stations, lines }: { isOpen: 
           </div>
           <div className="mb-2">
             <label className="block text-gray-700">Start Time</label>
-            <input type="datetime-local" className="w-full border rounded p-2 text-black" value={startTime} onChange={e => setStartTime(e.target.value)} required />
+            <input type="datetime-local" className="w-full border rounded p-2 text-black" value={startTime} onChange={e => setStartTime(e.target.value)} min={`${todayStr}T00:00`} max={`${todayStr}T23:59`} required />
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">End Time</label>
-            <input type="datetime-local" className="w-full border rounded p-2 text-black" value={endTime} onChange={e => setEndTime(e.target.value)} />
+            <input type="datetime-local" className="w-full border rounded p-2 text-black" value={endTime} onChange={e => setEndTime(e.target.value)} min={startTime} max={`${todayStr}T23:59`}/>
           </div>
           <div className="flex justify-end space-x-2">
             <button type="button" className="px-4 py-2 bg-gray-300 rounded" onClick={onClose}>Cancel</button>
@@ -137,13 +143,16 @@ export default function LogTrip() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-black">
       <TopNavBar/>
       <div className="container mx-auto p-4">
         <button className="mb-4 px-4 py-2 bg-blue-600 text-white rounded" onClick={() => setModalOpen(true)}>
-          Add Trip
+          Add Trip Manually
         </button>
         <AddTripModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleAddTrip} stations={stations} lines={lines}/>
+          <button>
+            Start Automatic Tracking
+          </button>
       </div>
     </div>
   )
