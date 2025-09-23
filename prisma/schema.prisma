@@ -40,13 +40,14 @@ model Line {
   color         String
   trips         Trip[]
   users         User[] 
+  stations      Station[]
 }
 
 model Station {
   id            String    @id @default(uuid())
   name          String
-  lines         String[]
   borough       String
   latitude      Float
   longitude     Float
+  lines         Line[]
 }

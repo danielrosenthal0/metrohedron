@@ -14,6 +14,7 @@ interface MTAStation {
 
 async function main() {
   // Clear existing data 
+  await prisma.trip.deleteMany({});
   await prisma.station.deleteMany({});
   await prisma.line.deleteMany({});
 
@@ -30,7 +31,7 @@ async function main() {
     }
   });
   const lines = Array.from(lineSet);
-
+  console.log(`Seeding ${lines.length} lines and ${stations.length} stations...`);
   for (const lineName of lines) {
     await prisma.line.create({
       data: {
@@ -47,10 +48,12 @@ async function main() {
       data: {
         id: station.gtfs_stop_id,
         name: station.stop_name,
-        lines: lineNames,
         borough: station.borough ?? "Unknown",
         latitude: station.gtfs_latitude ? Number(station.gtfs_latitude) : 0,
         longitude: station.gtfs_longitude ? Number(station.gtfs_longitude) : 0,
+        lines: {
+          connect: lineNames.map(name => ({ name })),
+        },
       },
     });
   }

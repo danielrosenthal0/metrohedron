@@ -14,12 +14,23 @@ interface Trip {
 interface Line {
   name: string;
   id: string;
+  stations: { id: string; name: string }[];
 }
 
 function AddTripModal({ isOpen, onClose, onSubmit, stations, lines }: { isOpen: boolean, onClose: () => void, onSubmit: (trip: Trip) => void, stations: { id: string, name: string }[], lines: Line[] }) {
   const [startStation, setStartStation] = useState("");
   const [endStation, setEndStation] = useState("");
   const [line, setLine] = useState("");
+  const [filteredStations, setFilteredStations] = useState<{ id: string; name: string }[]>([]);
+  useEffect(() => {
+    if (line) {
+      const selectedLine = lines.find(l => l.id === line);
+      setFilteredStations(selectedLine ? selectedLine.stations : []);
+    } else {
+      // If no line is selected, clear the available stations
+      setFilteredStations([]);
+    }
+  }, [line, lines]);
 
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -44,10 +55,19 @@ function AddTripModal({ isOpen, onClose, onSubmit, stations, lines }: { isOpen: 
           }}
         >
           <div className="mb-2">
+            <label className="block text-gray-700">Line</label>
+            <select className="w-full border rounded p-2 text-black" value={line} onChange={e => setLine(e.target.value)} required >
+              <option value="">Select a line</option>
+              {lines.map(line => (
+                <option key={line.id} value={line.id}>{line.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-2">
             <label className="block text-gray-700">Start Station</label>
             <select className="w-full border rounded p-2 text-black" value={startStation} onChange={e => setStartStation(e.target.value)} required>
               <option value="">Select a station</option>
-              {stations.map(station => (
+              {filteredStations.map(station => (
                 <option key={station.id} value={station.name}>{station.name}</option>
               ))}
             </select>
@@ -61,15 +81,7 @@ function AddTripModal({ isOpen, onClose, onSubmit, stations, lines }: { isOpen: 
               ))}
             </select>
           </div>
-          <div className="mb-2">
-            <label className="block text-gray-700">Line</label>
-            <select className="w-full border rounded p-2 text-black" value={line} onChange={e => setLine(e.target.value)} required >
-              <option value="">Select a line</option>
-              {lines.map(line => (
-                <option key={line.id} value={line.id}>{line.name}</option>
-              ))}
-            </select>
-          </div>
+
           <div className="mb-2">
             <label className="block text-gray-700">Start Time</label>
             <input type="datetime-local" className="w-full border rounded p-2 text-black" value={startTime} onChange={e => setStartTime(e.target.value)} min={`${todayStr}T00:00`} max={`${todayStr}T23:59`} required />
@@ -79,7 +91,7 @@ function AddTripModal({ isOpen, onClose, onSubmit, stations, lines }: { isOpen: 
             <input type="datetime-local" className="w-full border rounded p-2 text-black" value={endTime} onChange={e => setEndTime(e.target.value)} min={startTime} max={`${todayStr}T23:59`}/>
           </div>
           <div className="flex justify-end space-x-2">
-            <button type="button" className="px-4 py-2 bg-gray-300 rounded" onClick={onClose}>Cancel</button>
+            <button type="button" className="px-4 py-2 bg-red-600 rounded" onClick={onClose}>Cancel</button>
             <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Add</button>
           </div>
         </form>
@@ -143,14 +155,14 @@ export default function LogTrip() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black ">
       <TopNavBar/>
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 flex flex-col justify-center items-center">
         <button className="mb-4 px-4 py-2 bg-blue-600 text-white rounded" onClick={() => setModalOpen(true)}>
           Add Trip Manually
         </button>
         <AddTripModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleAddTrip} stations={stations} lines={lines}/>
-          <button>
+          <button className="mb-4 px-4 py-2 bg-blue-600 text-white rounded">
             Start Automatic Tracking
           </button>
       </div>

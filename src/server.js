@@ -45,17 +45,20 @@ app.get('/stations', async (req, res) => {
 
 app.get('/lines', async (req, res) => {
   try {
-    const lines = await prisma.line.findMany();
-    lines.sort((a, b) => {
-      const aNum = parseInt(a.name, 10);
-      const bNum = parseInt(b.name, 10);
-      const aIsNum = !isNaN(aNum);
-      const bIsNum = !isNaN(bNum);
-      if (aIsNum && bIsNum) return aNum - bNum;
-      if (aIsNum) return -1;
-      if (bIsNum) return 1;
-      return a.name.localeCompare(b.name);
+    const lines = await prisma.line.findMany({
+      include: { stations: true }
     });
+    console.log('Fetched lines:', lines);
+    // lines.sort((a, b) => {
+    //   const aNum = parseInt(a.name, 10);
+    //   const bNum = parseInt(b.name, 10);
+    //   const aIsNum = !isNaN(aNum);
+    //   const bIsNum = !isNaN(bNum);
+    //   if (aIsNum && bIsNum) return aNum - bNum;
+    //   if (aIsNum) return -1;
+    //   if (bIsNum) return 1;
+    //   return a.name.localeCompare(b.name);
+    // });
     res.json(lines);
   } catch (error) {
     console.error('Error fetching lines:', error);
