@@ -48,7 +48,6 @@ app.get('/lines', async (req, res) => {
     const lines = await prisma.line.findMany({
       include: { stations: true }
     });
-    console.log('Fetched lines:', lines);
     // lines.sort((a, b) => {
     //   const aNum = parseInt(a.name, 10);
     //   const bNum = parseInt(b.name, 10);

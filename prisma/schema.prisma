@@ -28,8 +28,7 @@ model Trip {
   line          Line      @relation(fields: [lineId], references: [id])
   startStation  String
   endStation    String
-  startTime     DateTime
-  endTime       DateTime?
+  tripDate      DateTime
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }

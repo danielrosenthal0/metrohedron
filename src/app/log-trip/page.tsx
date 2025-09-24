@@ -7,8 +7,7 @@ interface Trip {
   startStation: string;
   endStation: string;
   line: string;
-  startTime: string;
-  endTime: string;
+  tripDate: Date;
 }
 
 interface Line {
@@ -27,19 +26,13 @@ function AddTripModal({ isOpen, onClose, onSubmit, stations, lines }: { isOpen: 
       const selectedLine = lines.find(l => l.id === line);
       setFilteredStations(selectedLine ? selectedLine.stations : []);
     } else {
-      // If no line is selected, clear the available stations
       setFilteredStations([]);
     }
   }, [line, lines]);
 
   const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const todayStr = `${yyyy}-${mm}-${dd}`;
-  const nowStr = `${todayStr}T${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
-  const [startTime, setStartTime] = useState(nowStr);
-  const [endTime, setEndTime] = useState("");
+  const todayString = today.toISOString().split('T')[0];
+  const [tripDate, setTripDate] = useState(todayString);
   if (!isOpen) return null;
 
   return (
@@ -49,8 +42,8 @@ function AddTripModal({ isOpen, onClose, onSubmit, stations, lines }: { isOpen: 
         <form
           onSubmit={e => {
             e.preventDefault();
-            onSubmit({ startStation, endStation, line, startTime, endTime });
-            setStartStation(""); setEndStation(""); setLine(""); setStartTime(""); setEndTime("");
+            onSubmit({ startStation, endStation, line, tripDate: new Date(tripDate) });
+            setStartStation(""); setEndStation(""); setLine(""); setTripDate(todayString);
             onClose();
           }}
         >
@@ -76,19 +69,15 @@ function AddTripModal({ isOpen, onClose, onSubmit, stations, lines }: { isOpen: 
             <label className="block text-gray-700">End Station</label>
             <select className="w-full border rounded p-2 text-black" value={endStation} onChange={e => setEndStation(e.target.value)} required>
               <option value="">Select a station</option>
-              {stations.map(station => (
+              {filteredStations.map(station => (
                 <option key={station.id} value={station.name}>{station.name}</option>
               ))}
             </select>
           </div>
 
           <div className="mb-2">
-            <label className="block text-gray-700">Start Time</label>
-            <input type="datetime-local" className="w-full border rounded p-2 text-black" value={startTime} onChange={e => setStartTime(e.target.value)} min={`${todayStr}T00:00`} max={`${todayStr}T23:59`} required />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">End Time</label>
-            <input type="datetime-local" className="w-full border rounded p-2 text-black" value={endTime} onChange={e => setEndTime(e.target.value)} min={startTime} max={`${todayStr}T23:59`}/>
+            <label className="block text-gray-700">Trip Date</label>
+            <input type="date" className="w-full border rounded p-2 text-black" value={tripDate} onChange={e => setTripDate(e.target.value)} required />
           </div>
           <div className="flex justify-end space-x-2">
             <button type="button" className="px-4 py-2 bg-red-600 rounded" onClick={onClose}>Cancel</button>
@@ -139,8 +128,7 @@ export default function LogTrip() {
           startStation: trip.startStation,
           endStation: trip.endStation,
           lineId: trip.line,
-          startTime: trip.startTime ? new Date(trip.startTime).toISOString() : undefined,
-          endTime: trip.endTime ? new Date(trip.endTime).toISOString() : undefined,
+          tripDate: trip.tripDate,
         },
         auth0Id: session?.user?.sub || "",
       }),
