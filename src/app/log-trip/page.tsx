@@ -16,7 +16,7 @@ interface Line {
   stations: { id: string; name: string }[];
 }
 
-function AddTripModal({ isOpen, onClose, onSubmit, stations, lines }: { isOpen: boolean, onClose: () => void, onSubmit: (trip: Trip) => void, stations: { id: string, name: string }[], lines: Line[] }) {
+function AddTripModal({ isOpen, onClose, onSubmit, lines }: { isOpen: boolean, onClose: () => void, onSubmit: (trip: Trip) => void, stations: { id: string, name: string }[], lines: Line[] }) {
   const [startStation, setStartStation] = useState("");
   const [endStation, setEndStation] = useState("");
   const [line, setLine] = useState("");

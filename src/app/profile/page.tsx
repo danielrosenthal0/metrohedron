@@ -1,8 +1,20 @@
 import TopNavBar from "@/components/TopNavBar";
 import { auth0 } from "@/lib/auth0";
-import { MapContainer, TileLayer, Polyline, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import Link from "next/link";
+
+interface Line {
+  name: string;
+  id: string;
+  stations: { id: string; name: string }[];
+}
+interface Trip {
+  id: string;
+  startStation: string;
+  endStation: string;
+  line: string;
+  tripDate: Date;
+}
 
 async function getUserData(auth0Id: string) {
   console.log("Fetching user data for auth0Id:", auth0Id);
@@ -30,16 +42,16 @@ export default async function Profile() {
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-white">Trips</h3>
                 <ul className="mb-4 list-disc list-inside text-white">
-                  {userData.trips && userData.trips.length > 0 ? userData.trips.map((trip: any) => (
+                  {userData.trips && userData.trips.length > 0 ? userData.trips.map((trip: Trip) => (
                     <p key={trip.id}>
-                      {trip.startStation} → {trip.endStation} ({trip.startTime})
+                      {trip.startStation} → {trip.endStation} ({trip.tripDate.toISOString().split('T')[0]})
                     </p>
                   )) : <p>No trips taken yet.</p>}
                 </ul>
                 <h3 className="text-lg font-semibold mb-2 text-white">Favorite Lines</h3>
                 <ul className="list-disc list-inside text-white">
-                  {userData.favoriteLines && userData.favoriteLines.length > 0 ? userData.favoriteLines.map((line: any) => (
-                    <p key={line.id}>{line.name} ({line.color})</p>
+                  {userData.favoriteLines && userData.favoriteLines.length > 0 ? userData.favoriteLines.map((line: Line) => (
+                    <p key={line.id}>{line.name} </p>
                   )) : <p>No favorite lines.</p>}
                 </ul>
               <Link
