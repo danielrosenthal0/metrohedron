@@ -13,12 +13,12 @@ interface Trip {
   startStation: string;
   endStation: string;
   line: string;
-  tripDate: Date;
+  tripDate: string;
 }
 
 async function getUserData(auth0Id: string) {
   console.log("Fetching user data for auth0Id:", auth0Id);
-  const res = await fetch(`http://localhost:4000/user/${encodeURIComponent(auth0Id)}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/user/${encodeURIComponent(auth0Id)}`);
   if (!res.ok) return null;
   return res.json();
 }
@@ -44,7 +44,7 @@ export default async function Profile() {
                 <ul className="mb-4 list-disc list-inside text-white">
                   {userData.trips && userData.trips.length > 0 ? userData.trips.map((trip: Trip) => (
                     <p key={trip.id}>
-                      {trip.startStation} → {trip.endStation} ({trip.tripDate.toISOString().split('T')[0]})
+                      {trip.startStation} → {trip.endStation} ({trip.tripDate})
                     </p>
                   )) : <p>No trips taken yet.</p>}
                 </ul>
