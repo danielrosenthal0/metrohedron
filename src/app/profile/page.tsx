@@ -1,26 +1,25 @@
 import TopNavBar from "@/components/TopNavBar";
 import { auth0 } from "@/lib/auth0";
+import { PrismaClient } from "@prisma/client";
 import 'leaflet/dist/leaflet.css';
 import Link from "next/link";
-
-interface Line {
-  name: string;
-  id: string;
-  stations: { id: string; name: string }[];
-}
-interface Trip {
-  id: string;
-  startStation: string;
-  endStation: string;
-  line: string;
-  tripDate: string;
-}
+const prisma = new PrismaClient();
 
 async function getUserData(auth0Id: string) {
   console.log("Fetching user data for auth0Id:", auth0Id);
-  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/user/${encodeURIComponent(auth0Id)}`);
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const user = await prisma.user.findUnique({
+      where: { auth0Id },
+      include: {
+        trips: true,
+        favoriteLines: true,
+      },
+    });
+    return user;
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return null;
+  }
 }
 
 export default async function Profile() {
@@ -42,15 +41,15 @@ export default async function Profile() {
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-white">Trips</h3>
                 <ul className="mb-4 list-disc list-inside text-white">
-                  {userData.trips && userData.trips.length > 0 ? userData.trips.map((trip: Trip) => (
+                  {userData.trips && userData.trips.length > 0 ? userData.trips.map((trip) => (
                     <p key={trip.id}>
-                      {trip.startStation} → {trip.endStation} ({trip.tripDate})
+                      {trip.startStation} → {trip.endStation} ({trip.tripDate.toISOString().split('T')[0]})
                     </p>
                   )) : <p>No trips taken yet.</p>}
                 </ul>
                 <h3 className="text-lg font-semibold mb-2 text-white">Favorite Lines</h3>
                 <ul className="list-disc list-inside text-white">
-                  {userData.favoriteLines && userData.favoriteLines.length > 0 ? userData.favoriteLines.map((line: Line) => (
+                  {userData.favoriteLines && userData.favoriteLines.length > 0 ? userData.favoriteLines.map((line) => (
                     <p key={line.id}>{line.name} </p>
                   )) : <p>No favorite lines.</p>}
                 </ul>

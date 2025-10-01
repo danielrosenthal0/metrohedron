@@ -104,21 +104,21 @@ export default function LogTrip() {
   }, []);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_URL}/stations`)
+    fetch(`/api/stations`)
       .then(res => res.json())
       .then(data => setStations(data))
       .catch(() => setStations([]));
   }, []);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_URL}/lines`)
+    fetch(`/api/lines`)
       .then(res => res.json())
       .then(data => setLines(data))
       .catch(() => setLines([]));
   }, []);
 
   function handleAddTrip(trip: Trip) {
-    fetch(`${process.env.NEXT_PUBLIC_URL}/new-trip`, {
+    fetch(`/api/new-trip`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

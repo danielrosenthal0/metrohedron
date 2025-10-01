@@ -1,0 +1,42 @@
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export async function GET(
+  request: Request,
+  { params }: { params: { auth0Id: string } }
+) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { auth0Id: params.auth0Id },
+      include: {
+        trips: {
+          include: { line: true }
+        }
+      }
+    });
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+    
+    const trips = user.trips.map(trip => ({
+      startStation: trip.startStation,
+      endStation: trip.endStation,
+      line: trip.line?.name || '',
+      tripDate: trip.tripDate
+    }));
+    
+    return NextResponse.json(trips);
+  } catch (error) {
+    console.error('Error fetching user trips:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
