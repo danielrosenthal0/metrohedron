@@ -26,7 +26,7 @@ export default function TopNavBar() {
         <div >
           {isAuthenticated === false && (
             <Link
-              href="/auth/login"
+              href="/auth/login?prompt=login"
               className="text-white bg-blue-500 px-3 py-1 rounded hover:bg-blue-700"
             >
               Log In / Sign Up

@@ -33,7 +33,7 @@ export default function Home() {
         ) : (
           <div className="bg-black p-6 rounded-lg shadow-md">
             <p className="mb-4 text-white">Sign in to start tracking subway journeys.</p>
-            <Link href="/auth/login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            <Link href="/auth/login?prompt=login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
               Get Started
             </Link>
           </div>
