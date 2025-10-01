@@ -5,11 +5,12 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
-  { params }: { params: { auth0Id: string } }
+  { params }: { params: Promise<{ auth0Id: string }> }
 ) {
   try {
+    const { auth0Id } = await params;
     const user = await prisma.user.findUnique({
-      where: { auth0Id: params.auth0Id },
+      where: { auth0Id },
       include: {
         trips: true,
         favoriteLines: true,
