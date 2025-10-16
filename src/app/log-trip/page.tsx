@@ -150,9 +150,9 @@ export default function LogTrip() {
           Add Trip Manually
         </button>
         <AddTripModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleAddTrip} stations={stations} lines={lines}/>
-          <button className="mb-4 px-4 py-2 bg-blue-600 text-white rounded">
+          {/* <button className="mb-4 px-4 py-2 bg-blue-600 text-white rounded">
             Start Automatic Tracking
-          </button>
+          </button> */}
       </div>
     </div>
   )
