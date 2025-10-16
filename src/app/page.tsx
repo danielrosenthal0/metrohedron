@@ -59,7 +59,7 @@ export default function Home() {
 
                 <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:border-blue-500 hover:shadow-lg cursor-pointer">
                   <div className="text-purple-400 text-4xl mb-2">📊</div>
-                  <h3 className="text-white font-semibold text-lg mb-1">Analytics</h3>
+                  <h3 className="text-white font-semibold text-lg mb-1">Analytics (Coming Soon)</h3>
                   <p className="text-gray-400 text-sm">Discover your patterns</p>
                 </div>
 
@@ -109,8 +109,8 @@ export default function Home() {
 
                 <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 backdrop-blur-sm transform transition-all duration-300 hover:bg-gray-800 hover:scale-105 hover:border-green-400">
                   <div className="text-green-400 text-3xl mb-3">🎯</div>
-                  <h3 className="text-white font-semibold text-lg mb-2">Track Progress</h3>
-                  <p className="text-gray-400 text-sm">See how many stations you've visited</p>
+                  <h3 className="text-white font-semibold text-lg mb-2">Track Progress (Coming Soon)</h3>
+                  <p className="text-gray-400 text-sm">See how many stations you&apos;ve visited</p>
                 </div>
               </div>
             </div>
