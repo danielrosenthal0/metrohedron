@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function TopNavBar() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const pathname = usePathname()
+  const router = useRouter();
+
   useEffect(() => {
     async function checkSession() {
       try {
@@ -22,13 +23,13 @@ export default function TopNavBar() {
     }
     
     checkSession();
-
   }, []);
-  console.log('NavBar: Rendering with state:', {
-    isAuthenticated,
-    pathname,
-    timestamp: new Date().toISOString()
-  });
+
+  const handleAuthClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push('/auth/login?prompt=login');
+  };
+
   return (
     <nav className="bg-gray-800 border-b border-gray-700 text-white p-4 shadow-lg backdrop-blur-sm bg-opacity-95 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
@@ -41,12 +42,12 @@ export default function TopNavBar() {
 
         <div>
           {isAuthenticated === false && (
-            <Link
-              href="/auth/login?prompt=login"
+            <button
+              onClick={handleAuthClick}
               className="text-white bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2 rounded-lg font-semibold shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-blue-500/50 hover:from-blue-500 hover:to-blue-400 active:scale-95"
             >
               Log In / Sign Up
-            </Link>
+            </button>
           )}
           {isAuthenticated === true && (
             <div className="flex items-center space-x-6">
