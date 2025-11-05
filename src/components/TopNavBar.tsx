@@ -2,44 +2,61 @@
 
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export default function TopNavBar() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const pathname = usePathname();
   const router = useRouter();
 
+  // Memoized session check
+  const checkSession = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth", {
+        credentials: 'include',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      const data = await res.json();
+      console.log("session check response: ", data);
+      return !!data?.user;
+    } catch (error) {
+      console.error('Session check failed:', error);
+      return false;
+    }
+  }, []);
+
+  // Update auth state
   useEffect(() => {
-    async function checkSession() {
-      try {
-        const res = await fetch("/api/auth", {
-          credentials: 'include'
-        });
-        const data = await res.json();
-        console.log("session check response: ", data);
-        setIsAuthenticated(!!data.user);
-      } catch (error) {
-        console.error('Session check failed:', error);
-        setIsAuthenticated(false);
-      }
+    checkSession().then(setIsAuthenticated);
+  }, [checkSession]);
+
+  // Handle navigation without triggering auth prefetch
+  const handleNavigate = async (path: string) => {
+    const isAuthed = await checkSession();
+    
+    if (!isAuthed) {
+      window.location.href = '/auth/login?prompt=login';
+      return;
     }
 
-    checkSession();
-  }, [pathname]);
-
-  const handleNavigate = async (path: string) => {
-    if (isAuthenticated) {
-      router.push(path);
+    // Use window.location for navigation to prevent prefetch
+    if (path === '/log-trip' || path === '/profile') {
+      window.location.href = path;
     } else {
-      router.push('/auth/login?prompt=login');
+      router.push(path);
     }
   };
 
   return (
     <nav className="bg-gray-800 border-b border-gray-700 text-white p-4 shadow-lg backdrop-blur-sm bg-opacity-95 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
+        {/* Use window.location for home to prevent prefetch */}
         <button 
-          onClick={() => router.push('/')}
+          onClick={() => window.location.href = '/'}
           className="text-2xl font-bold transition-all duration-200 hover:text-blue-400 hover:scale-105 transform"
         >
           metrohedron
@@ -48,7 +65,7 @@ export default function TopNavBar() {
         <div>
           {isAuthenticated === false && (
             <button
-              onClick={() => router.push('/auth/login?prompt=login')}
+              onClick={() => window.location.href = '/auth/login?prompt=login'}
               className="text-white bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2 rounded-lg font-semibold shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-blue-500/50 hover:from-blue-500 hover:to-blue-400 active:scale-95"
             >
               Log In / Sign Up
