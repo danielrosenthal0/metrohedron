@@ -12,5 +12,6 @@ server start
 `node src/server.js`
 db start
 make sure "metrohedron" image is running in Docker
+target correct db with connection string in local settings
 `prisma client start`
 npx prisma

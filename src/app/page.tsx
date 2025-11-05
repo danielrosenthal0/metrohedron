@@ -28,7 +28,7 @@ export default function Home() {
               Track Your NYC Subway Journeys
             </h1>
             <p className="text-xl text-gray-400 mb-8">
-              Log trips, analyze patterns, and master the MTA
+              Log trips and see your journeys across the  MTA
             </p>
           </div>
 
@@ -51,13 +51,13 @@ export default function Home() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:border-blue-500 hover:shadow-lg cursor-pointer">
+                <Link href="/profile" className="bg-gray-800 border border-gray-700 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:border-blue-500 hover:shadow-lg cursor-pointer">
                   <div className="text-green-400 text-4xl mb-2">🚇</div>
                   <h3 className="text-white font-semibold text-lg mb-1">Recent Trips</h3>
                   <p className="text-gray-400 text-sm">View your journey history</p>
-                </div>
+                </Link>
 
-                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:border-blue-500 hover:shadow-lg cursor-pointer">
+                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:border-blue-500 hover:shadow-lg">
                   <div className="text-purple-400 text-4xl mb-2">📊</div>
                   <h3 className="text-white font-semibold text-lg mb-1">Analytics (Coming Soon)</h3>
                   <p className="text-gray-400 text-sm">Discover your patterns</p>
@@ -107,7 +107,7 @@ export default function Home() {
                   <p className="text-gray-400 text-sm">Analyze your travel patterns and optimize routes</p>
                 </div> */}
 
-                <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 backdrop-blur-sm transform transition-all duration-300 hover:bg-gray-800 hover:scale-105 hover:border-green-400">
+                <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 backdrop-blur-sm transform transition-all duration-300 hover:bg-gray-800 hover:scale-105 hover:border-blue-400">
                   <div className="text-green-400 text-3xl mb-3">🎯</div>
                   <h3 className="text-white font-semibold text-lg mb-2">Track Progress (Coming Soon)</h3>
                   <p className="text-gray-400 text-sm">See how many stations you&apos;ve visited</p>
