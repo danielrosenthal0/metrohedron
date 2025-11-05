@@ -94,7 +94,7 @@ export default function Profile() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const sessionRes = await fetch("/api/auth/", {
+                const sessionRes = await fetch("/api/auth", {
       credentials: 'include'
     });
                 const sessionData = await sessionRes.json();
@@ -245,12 +245,24 @@ export default function Profile() {
                 </div>
 
                 <div className="flex justify-center">
-                  <Link
-                    href="/auth/logout"
-                    className="text-white bg-gradient-to-r from-red-600 to-red-500 px-6 py-3 rounded-lg font-semibold shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-red-500/50 hover:from-red-500 hover:to-red-400 active:scale-95"
-                  >
-                    Log Out
-                  </Link>
+                 <button
+    onClick={async () => {
+        try {
+            const res = await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            if (res.ok) {
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    }}
+    className="text-white bg-gradient-to-r from-red-600 to-red-500 px-6 py-3 rounded-lg font-semibold shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-red-500/50 hover:from-red-500 hover:to-red-400 active:scale-95"
+>
+    Log Out
+</button>
                 </div>
               </>
             ) : (
