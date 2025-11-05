@@ -7,14 +7,29 @@ export default function Home() {
   const [session, setSession] = useState<{ user?: { name?: string } } | null>(null);
 
   useEffect(() => {
-    fetch("/api/auth/session")
-      .then((res) => res.json())
-      .then((data) => {
-        setSession(data);
-        if (data && data.user) {
-          fetch("/api/auth/post-login", { method: "POST" });
+    async function checkSession() {
+      try {
+        const sessionRes = await fetch("/api/auth",{
+      credentials: 'include'
+    });
+        const sessionData = await sessionRes.json();
+        setSession(sessionData);
+
+        if (sessionData?.user) {
+          await fetch("/api/auth/post-login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: 'include'
+          });
         }
-      });
+      } catch (error) {
+        console.error("Session check failed:", error);
+      }
+    }
+
+    checkSession();
   }, []);
 
   return (

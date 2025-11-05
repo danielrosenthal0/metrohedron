@@ -10,7 +10,9 @@ export default function TopNavBar() {
   useEffect(() => {
     async function checkSession() {
       try {
-        const res = await fetch("/api/auth/session");
+        const res = await fetch("/api/auth", {
+      credentials: 'include'
+    });
         const data = await res.json();
         console.log("session check response: ", data)
         setIsAuthenticated(!!data.user);

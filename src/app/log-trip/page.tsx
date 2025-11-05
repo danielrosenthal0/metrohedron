@@ -135,7 +135,9 @@ export default function LogTrip() {
   const [session, setSession] = useState<{ user?: { name?: string; sub?: string } } | null>(null);
 
   useEffect(() => {
-    fetch("/api/auth/session")
+    fetch("/api/auth", {
+      credentials: 'include'
+    })
       .then((res) => res.json())
       .then((data) => {
         setSession(data);

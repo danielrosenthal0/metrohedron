@@ -94,7 +94,9 @@ export default function Profile() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const sessionRes = await fetch("/api/auth/session");
+                const sessionRes = await fetch("/api/auth/", {
+      credentials: 'include'
+    });
                 const sessionData = await sessionRes.json();
                 setSession(sessionData);
                 
