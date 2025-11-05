@@ -8,31 +8,32 @@ export default function TopNavBar() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const pathname = usePathname()
   useEffect(() => {
-    let mounted = true;
     async function checkSession() {
       try {
-        const res = await fetch("/api/auth/session", {
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
-        });
+        const res = await fetch("/api/auth/session");
         const data = await res.json();
-        if (mounted) {
-          setIsAuthenticated(!!data.user);
-
-        }
-      } catch {
+        console.log("session check response: ", data)
+        setIsAuthenticated(!!data.user);
+        console.log("navbar updated auth state to: ", !!data.user)
+      } catch (error) {
+          console.error('NavBar: Session check failed:', {
+          error,
+          pathname,
+          timestamp: new Date().toISOString()
+        });
         setIsAuthenticated(false);
+
       }
     }
     
     checkSession();
-    return () => {
-      mounted = false;
-    };
-  }, [pathname]);
 
+  }, [pathname]);
+  console.log('NavBar: Rendering with state:', {
+    isAuthenticated,
+    pathname,
+    timestamp: new Date().toISOString()
+  });
   return (
     <nav className="bg-gray-800 border-b border-gray-700 text-white p-4 shadow-lg backdrop-blur-sm bg-opacity-95 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
