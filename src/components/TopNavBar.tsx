@@ -11,26 +11,19 @@ export default function TopNavBar() {
     async function checkSession() {
       try {
         const res = await fetch("/api/auth", {
-      credentials: 'include'
-    });
-        const data = await res.json();
-        console.log("session check response: ", data)
-        setIsAuthenticated(!!data.user);
-        console.log("navbar updated auth state to: ", !!data.user)
-      } catch (error) {
-          console.error('NavBar: Session check failed:', {
-          error,
-          pathname,
-          timestamp: new Date().toISOString()
+          credentials: 'include'
         });
+        const data = await res.json();
+        setIsAuthenticated(!!data.user);
+      } catch (error) {
+        console.error('NavBar: Session check failed:', error);
         setIsAuthenticated(false);
-
       }
     }
     
     checkSession();
 
-  }, [pathname]);
+  }, []);
   console.log('NavBar: Rendering with state:', {
     isAuthenticated,
     pathname,

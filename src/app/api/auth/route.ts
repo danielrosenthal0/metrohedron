@@ -1,5 +1,4 @@
 import { auth0 } from "@/lib/auth0";
-// import { PagesRouterRequest } from "@auth0/nextjs-auth0/types";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {

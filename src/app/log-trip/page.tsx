@@ -1,7 +1,7 @@
 "use client";
 
 import TopNavBar from "@/components/TopNavBar"
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 interface Trip {
   startStation: string;
@@ -134,30 +134,14 @@ export default function LogTrip() {
   const [lines, setLines] = useState<Line[]>([]);
   const [session, setSession] = useState<{ user?: { name?: string; sub?: string } } | null>(null);
 
-  const sessionChecked = useRef(false);
-
   useEffect(() => {
-    if (!sessionChecked.current) {
-      sessionChecked.current = true;
-      fetch("/api/auth", {
-        credentials: 'include',
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (!data.user) {
-            window.location.href = '/auth/login?prompt=login';
-            return;
-          }
-          setSession(data);
-        })
-        .catch(() => {
-          window.location.href = '/auth/login?prompt=login';
-        });
-    }
+    fetch("/api/auth", {
+      credentials: 'include'
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setSession(data);
+      });
   }, []);
 
   useEffect(() => {

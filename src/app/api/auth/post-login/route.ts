@@ -17,14 +17,12 @@ export async function POST(request: NextRequest) {
 
     const { sub, email, name } = session.user;
 
-    // Check if user exists by auth0Id or email
     let user = await prisma.user.findUnique({ where: { auth0Id: sub } });
     if (!user && email) {
       user = await prisma.user.findUnique({ where: { email } });
     }
 
     if (!user) {
-      // Create user
       user = await prisma.user.create({
         data: {
           auth0Id: sub,
