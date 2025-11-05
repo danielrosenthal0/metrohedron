@@ -1,76 +1,77 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function TopNavBar() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const pathname = usePathname()
+  const pathname = usePathname();
+  const router = useRouter();
+
   useEffect(() => {
     async function checkSession() {
       try {
         const res = await fetch("/api/auth", {
-      credentials: 'include'
-    });
-        const data = await res.json();
-        console.log("session check response: ", data)
-        setIsAuthenticated(!!data.user);
-        console.log("navbar updated auth state to: ", !!data.user)
-      } catch (error) {
-          console.error('NavBar: Session check failed:', {
-          error,
-          pathname,
-          timestamp: new Date().toISOString()
+          credentials: 'include'
         });
+        const data = await res.json();
+        console.log("session check response: ", data);
+        setIsAuthenticated(!!data.user);
+      } catch (error) {
+        console.error('Session check failed:', error);
         setIsAuthenticated(false);
-
       }
     }
-    
-    checkSession();
 
+    checkSession();
   }, [pathname]);
-  console.log('NavBar: Rendering with state:', {
-    isAuthenticated,
-    pathname,
-    timestamp: new Date().toISOString()
-  });
+
+  const handleNavigate = async (path: string) => {
+    if (isAuthenticated) {
+      router.push(path);
+    } else {
+      router.push('/auth/login?prompt=login');
+    }
+  };
+
   return (
     <nav className="bg-gray-800 border-b border-gray-700 text-white p-4 shadow-lg backdrop-blur-sm bg-opacity-95 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <Link 
-          href="/" 
+        <button 
+          onClick={() => router.push('/')}
           className="text-2xl font-bold transition-all duration-200 hover:text-blue-400 hover:scale-105 transform"
         >
           metrohedron
-        </Link>
+        </button>
 
         <div>
           {isAuthenticated === false && (
-            <Link
-              href="/auth/login?prompt=login"
+            <button
+              onClick={() => router.push('/auth/login?prompt=login')}
               className="text-white bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2 rounded-lg font-semibold shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-blue-500/50 hover:from-blue-500 hover:to-blue-400 active:scale-95"
             >
               Log In / Sign Up
-            </Link>
+            </button>
           )}
           {isAuthenticated === true && (
             <div className="flex items-center space-x-6">
-              <Link 
-                href="/log-trip" 
-                className="text-gray-300 hover:text-white font-semibold transition-all duration-200 hover:scale-105 transform relative group"
+              <button
+                onClick={() => handleNavigate('/log-trip')}
+                className={`text-gray-300 hover:text-white transition-colors ${
+                  pathname === "/log-trip" ? "text-white" : ""
+                }`}
               >
                 Log Trip
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
-              </Link>
-              <Link 
-                href="/profile" 
-                className="text-gray-300 hover:text-white font-semibold transition-all duration-200 hover:scale-105 transform relative group"
+              </button>
+              <button
+                onClick={() => handleNavigate('/profile')}
+                className={`text-gray-300 hover:text-white transition-colors ${
+                  pathname === "/profile" ? "text-white" : ""
+                }`}
               >
                 Profile
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
-              </Link>
+              </button>
             </div>
           )}
         </div>
