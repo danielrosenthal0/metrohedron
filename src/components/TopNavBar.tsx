@@ -1,23 +1,37 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function TopNavBar() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
+  const pathname = usePathname()
   useEffect(() => {
+    let mounted = true;
     async function checkSession() {
       try {
-        const res = await fetch("/api/auth/session");
+        const res = await fetch("/api/auth/session", {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
         const data = await res.json();
-        setIsAuthenticated(!!data.user);
+        if (mounted) {
+          setIsAuthenticated(!!data.user);
+
+        }
       } catch {
         setIsAuthenticated(false);
       }
     }
+    
     checkSession();
-  }, []);
+    return () => {
+      mounted = false;
+    };
+  }, [pathname]);
 
   return (
     <nav className="bg-gray-800 border-b border-gray-700 text-white p-4 shadow-lg backdrop-blur-sm bg-opacity-95 sticky top-0 z-50">
