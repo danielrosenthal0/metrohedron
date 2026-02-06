@@ -4,7 +4,10 @@ import TopNavBar from "@/components/TopNavBar";
 import 'leaflet/dist/leaflet.css';
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import dynamic from 'next/dynamic';
+import { Station } from "@prisma/client";
 
+const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 interface Line {
   id: string;
   name: string;
@@ -79,8 +82,8 @@ export default function Profile() {
     const [session, setSession] = useState<{ user?: { name?: string; sub?: string } } | null>(null);
     type Trip = {
       id: string;
-      startStation: string;
-      endStation: string;
+      startStation: Station;
+      endStation: Station;
       tripDate: string;
     };
     type UserData = {
@@ -178,7 +181,7 @@ export default function Profile() {
                               <div className="text-2xl">📍</div>
                               <div>
                                 <p className="text-white font-semibold text-lg">
-                                  {trip.startStation} → {trip.endStation}
+                                  {trip.startStation.name} → {trip.endStation.name}
                                 </p>
                                 <p className="text-gray-400 text-sm">
                                   {new Date(trip.tripDate).toLocaleDateString('en-US', {
@@ -192,6 +195,13 @@ export default function Profile() {
                             </div>
                             <div className="text-gray-500">→</div>
                           </div>
+                          <Map 
+                            center={[trip.startStation.latitude, trip.startStation.longitude]} 
+                            zoom={13}
+
+                            startStationCoord={[trip.startStation.latitude, trip.startStation.longitude]}
+                            endStationCoord={[trip.endStation.latitude, trip.endStation.longitude]}
+                          />
                         </div>
                       ))
                     ) : (

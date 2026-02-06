@@ -4,8 +4,8 @@ import TopNavBar from "@/components/TopNavBar"
 import { useState, useEffect } from "react";
 
 interface Trip {
-  startStation: string;
-  endStation: string;
+  startStationId: string;
+  endStationId: string;
   line: string;
   tripDate: Date;
 }
@@ -16,7 +16,12 @@ interface Line {
   stations: { id: string; name: string }[];
 }
 
-function AddTripModal({ isOpen, onClose, onSubmit, lines }: { isOpen: boolean, onClose: () => void, onSubmit: (trip: Trip) => void, stations: { id: string, name: string }[], lines: Line[] }) {
+interface Station {
+  name: string;
+  id: string
+}
+
+function AddTripModal({ isOpen, onClose, onSubmit, lines }: { isOpen: boolean, onClose: () => void, onSubmit: (trip: Trip) => void, stations: Station[], lines: Line[] }) {
   const [startStation, setStartStation] = useState("");
   const [endStation, setEndStation] = useState("");
   const [line, setLine] = useState("");
@@ -44,7 +49,7 @@ function AddTripModal({ isOpen, onClose, onSubmit, lines }: { isOpen: boolean, o
         <form
           onSubmit={e => {
             e.preventDefault();
-            onSubmit({ startStation, endStation, line, tripDate: new Date(tripDate) });
+            onSubmit({ startStationId: startStation, endStationId: endStation, line, tripDate: new Date(tripDate) });
             setStartStation(""); setEndStation(""); setLine(""); setTripDate(todayString);
             onClose();
           }}
@@ -75,7 +80,7 @@ function AddTripModal({ isOpen, onClose, onSubmit, lines }: { isOpen: boolean, o
             >
               <option value="">Select a station</option>
               {filteredStations.map(station => (
-                <option key={station.id} value={station.name}>{station.name}</option>
+                <option key={station.id} value={station.id}>{station.name}</option>
               ))}
             </select>
           </div>
@@ -91,7 +96,7 @@ function AddTripModal({ isOpen, onClose, onSubmit, lines }: { isOpen: boolean, o
             >
               <option value="">Select a station</option>
               {filteredStations.map(station => (
-                <option key={station.id} value={station.name}>{station.name}</option>
+                <option key={station.id} value={station.id}>{station.name}</option>
               ))}
             </select>
           </div>
@@ -166,8 +171,8 @@ export default function LogTrip() {
       },
       body: JSON.stringify({
         trip: {
-          startStation: trip.startStation,
-          endStation: trip.endStation,
+          startStationId: trip.startStationId,
+          endStationId: trip.endStationId,
           lineId: trip.line,
           tripDate: trip.tripDate,
         },

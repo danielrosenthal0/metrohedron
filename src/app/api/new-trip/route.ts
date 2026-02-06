@@ -17,7 +17,7 @@ export async function POST(request: Request) {
         { status: 404 }
       );
     }
-    
+    console.log(trip)
     const newTrip = await prisma.trip.create({
       data: {
         ...trip,

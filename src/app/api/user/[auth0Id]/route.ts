@@ -12,8 +12,13 @@ export async function GET(
     const user = await prisma.user.findUnique({
       where: { auth0Id },
       include: {
-        trips: true,
-        favoriteLines: true,
+        trips: {
+          include: {
+            startStation: true,
+            endStation: true
+          }
+        },
+        favoriteLines: true
       },
     });
     
