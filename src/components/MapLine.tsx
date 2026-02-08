@@ -16,21 +16,29 @@ L.Icon.Default.mergeOptions({
 
 export default function MapLine() {
   const [points, setPoints] = useState<Record<string, { positions: [number, number][], color: string }>>({});
+  // this creates a hashmap for line ids as keys, positions and the line color as values, will look like {
+//   "5..N01R": { 
+//     positions: [[40.7, -73.9], [40.71, -73.91], ...], 
+//     color: "#009952" 
+//   },
+//   "5..N32R": { 
+//     positions: [[40.8, -73.8], ...], 
+//     color: "#009952" 
+//   }
+// }
 
-  // const lineId = line.id;
-useEffect(() => {
+  useEffect(() => {
     // all lines
     fetch(`/api/lines`)
       .then(res => res.json())
       .then((data: Line[]) => {
-        console.log("got lines: ", data);
         
         // shapes for each line
         data.forEach((line: Line) => {
           fetch(`/api/points?lineId=${line.id}`)
             .then(res => res.json())
             .then((shapes: Record<string, { positions: [number, number][], color: string }>) => {
-              
+              // takes response from api in correct hashmap format, takes previous state and appends new line shape
               setPoints(prev => ({
                 ...prev,
                 ...shapes  
@@ -49,13 +57,13 @@ useEffect(() => {
     
   return (
     <div style={{ height: '500px', width: '100%' }}>
-<MapContainer center={[40.7128, -74.0060]} zoom={12} style={{ height: '100%', width: '100%' }}>
-  <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+      <MapContainer center={[40.7128, -74.0060]} zoom={12} style={{ height: '100%', width: '100%' }}>
+        <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'>
 
-  </TileLayer>
+        </TileLayer>
 
-{Object.entries(points).map(([shapeId, { positions, color }]) => {
+        {Object.entries(points).map(([shapeId, { positions, color }]) => {
           return positions && positions.length > 0 ? (
             <Polyline 
               key={shapeId}
@@ -68,7 +76,7 @@ useEffect(() => {
             />
           ) : null;
         })}
-</MapContainer>
+      </MapContainer>
     </div>
   )
 }
