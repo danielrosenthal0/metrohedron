@@ -42,6 +42,7 @@ model Line {
   trips         Trip[]
   users         User[] 
   stations      Station[]
+  lineShape     LineShape[]
 }
 
 model Station {
@@ -53,4 +54,14 @@ model Station {
   lines         Line[]
   tripsAsStart  Trip[]    @relation("TripStartStation")
   tripsAsEnd    Trip[]    @relation("TripEndStation")
+}
+
+model LineShape {
+  id                  String @id @default(uuid())
+  shapeId             String
+  shapePointSequence  Int
+  shapePointLatitude  Float
+  shapePointLongitude Float
+  line                Line   @relation(fields: [lineId], references: [id])
+  lineId              String
 }

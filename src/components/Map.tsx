@@ -3,8 +3,9 @@
 import { MapContainer, Marker, Polyline, TileLayer } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
+// need this for known issue with leaflet and next js webpack, loses icon png location
+// how this typing works: ts does not know type of getIconUrl, hidden by leaflet. this creates a combo type with L.Icon.Default and the unknown optional type of the function, unknown makes it so we don't care about type since it is being deleted anyways
 delete (L.Icon.Default.prototype as L.Icon.Default & { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -19,7 +20,6 @@ interface MapProps {
 }
 
 export default function Map({center, zoom = 13, startStationCoord, endStationCoord}: MapProps) {
-  console.log(center)
   return (
     <div>
       <MapContainer center={center} 
@@ -31,7 +31,7 @@ export default function Map({center, zoom = 13, startStationCoord, endStationCoo
       />
       <Marker position={startStationCoord}></Marker>
         <Marker position={endStationCoord}></Marker>
-<Polyline 
+        <Polyline 
           positions={[startStationCoord, endStationCoord]}
           color="blue"
           weight={3}

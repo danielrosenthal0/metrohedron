@@ -196,7 +196,7 @@ export default function Profile() {
                             <div className="text-gray-500">→</div>
                           </div>
                           <Map 
-                            center={[trip.startStation.latitude, trip.startStation.longitude]} 
+                            center={[(trip.startStation.latitude + trip.endStation.latitude) / 2, (trip.startStation.longitude + trip.endStation.longitude) / 2]} 
                             zoom={13}
 
                             startStationCoord={[trip.startStation.latitude, trip.startStation.longitude]}
