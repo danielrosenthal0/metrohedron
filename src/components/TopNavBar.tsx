@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function TopNavBar() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const pathname = usePathname()
   useEffect(() => {
     async function checkSession() {
       try {
@@ -24,11 +22,7 @@ export default function TopNavBar() {
     checkSession();
 
   }, []);
-  console.log('NavBar: Rendering with state:', {
-    isAuthenticated,
-    pathname,
-    timestamp: new Date().toISOString()
-  });
+
   return (
     <nav className="bg-gray-800 border-b border-gray-700 text-white p-4 shadow-lg backdrop-blur-sm bg-opacity-95 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">

@@ -26,8 +26,8 @@ export async function GET(
     }
     
     const trips = user.trips.map(trip => ({
-      startStation: trip.startStation,
-      endStation: trip.endStation,
+      startStation: trip.startStationId,
+      endStation: trip.endStationId,
       line: trip.line?.name || '',
       tripDate: trip.tripDate
     }));

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import TopNavBar from "@/components/TopNavBar";
+import MapLine from "@/components/MapLine";
 
 export default function Home() {
   const [session, setSession] = useState<{ user?: { name?: string } } | null>(null);
@@ -49,6 +50,9 @@ export default function Home() {
 
           {session && session.user ? (
             <div className="space-y-8">
+              <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 shadow-2xl">
+                <MapLine></MapLine>
+              </div>
               <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 shadow-2xl transform transition-all duration-300 hover:scale-105 hover:border-blue-500">
                 <h2 className="text-3xl font-bold mb-4 text-white">
                   Welcome back, {session.user.name}! 👋

@@ -26,8 +26,10 @@ model Trip {
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   lineId        String
   line          Line      @relation(fields: [lineId], references: [id])
-  startStation  String
-  endStation    String
+  startStationId  String
+  startStation  Station   @relation("TripStartStation", fields: [startStationId], references: [id])
+  endStationId  String
+  endStation    Station   @relation("TripEndStation", fields: [endStationId], references: [id])
   tripDate      DateTime
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -40,6 +42,7 @@ model Line {
   trips         Trip[]
   users         User[] 
   stations      Station[]
+  lineShape     LineShape[]
 }
 
 model Station {
@@ -49,4 +52,16 @@ model Station {
   latitude      Float
   longitude     Float
   lines         Line[]
+  tripsAsStart  Trip[]    @relation("TripStartStation")
+  tripsAsEnd    Trip[]    @relation("TripEndStation")
+}
+
+model LineShape {
+  id                  String @id @default(uuid())
+  shapeId             String
+  shapePointSequence  Int
+  shapePointLatitude  Float
+  shapePointLongitude Float
+  line                Line   @relation(fields: [lineId], references: [id])
+  lineId              String
 }
