@@ -35,12 +35,12 @@ export default function TopNavBar() {
 
         <div>
           {isAuthenticated === false && (
-            <Link
+            <a
               href="/auth/login?prompt=login"
               className="text-white bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2 rounded-lg font-semibold shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-blue-500/50 hover:from-blue-500 hover:to-blue-400 active:scale-95"
             >
               Log In / Sign Up
-            </Link>
+            </a>
           )}
           {isAuthenticated === true && (
             <div className="flex items-center space-x-6">
