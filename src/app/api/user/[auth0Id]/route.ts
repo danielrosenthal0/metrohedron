@@ -13,7 +13,11 @@ export async function GET(
       where: { auth0Id },
       include: {
         trips: {
+          orderBy: {
+            createdAt: 'asc',
+          },
           include: {
+            line: true,
             startStation: true,
             endStation: true
           }

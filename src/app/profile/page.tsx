@@ -3,7 +3,7 @@
 import TopNavBar from "@/components/TopNavBar";
 import 'leaflet/dist/leaflet.css';
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import dynamic from 'next/dynamic';
 import { Station } from "@prisma/client";
 
@@ -11,6 +11,22 @@ const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 interface Line {
   id: string;
   name: string;
+  color: string;
+}
+
+function normalizeStationKey(name?: string) {
+  return (name || "")
+    .toLowerCase()
+    .replace(/\(.*?\)/g, " ")
+    .replace(/-/g, " ")
+    .replace(/\b(\d+)(st|nd|rd|th)\b/g, "$1")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\bstation\b/g, " ")
+    .replace(/\bstreet\b/g, "st")
+    .replace(/\bavenue\b/g, "av")
+    .replace(/\bsq\b/g, "square")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 
@@ -82,6 +98,8 @@ export default function Profile() {
     const [session, setSession] = useState<{ user?: { name?: string; sub?: string } } | null>(null);
     type Trip = {
       id: string;
+      line: Line;
+      createdAt: string;
       startStation: Station;
       endStation: Station;
       tripDate: string;
@@ -93,6 +111,45 @@ export default function Profile() {
       favoriteLines?: Line[];
     };
     const [userData, setUserData] = useState<UserData | null>(null);
+
+    const journeys = useMemo(() => {
+      if (!userData?.trips || userData.trips.length === 0) return [];
+
+      const sortedTrips = [...userData.trips].sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+
+      const groups: Trip[][] = [];
+      const maxGapMs = 30_000;
+
+      sortedTrips.forEach((trip) => {
+        const lastGroup = groups[groups.length - 1];
+        if (!lastGroup) {
+          groups.push([trip]);
+          return;
+        }
+
+        const lastSegment = lastGroup[lastGroup.length - 1];
+        const sameTripDate = trip.tripDate.slice(0, 10) === lastSegment.tripDate.slice(0, 10);
+        const closeInTime =
+          Math.abs(new Date(trip.createdAt).getTime() - new Date(lastSegment.createdAt).getTime()) <= maxGapMs;
+        const chainsWithPrevious =
+          lastSegment.endStation.id === trip.startStation.id ||
+          normalizeStationKey(lastSegment.endStation.name) === normalizeStationKey(trip.startStation.name);
+
+        if (sameTripDate && closeInTime && chainsWithPrevious) {
+          lastGroup.push(trip);
+        } else {
+          groups.push([trip]);
+        }
+      });
+
+      return groups.sort((a, b) => {
+        const aLast = a[a.length - 1];
+        const bLast = b[b.length - 1];
+        return new Date(bLast.createdAt).getTime() - new Date(aLast.createdAt).getTime();
+      });
+    }, [userData?.trips]);
 
     useEffect(() => {
         async function fetchData() {
@@ -158,7 +215,7 @@ export default function Profile() {
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                       🚇 Your Trips
                       <span className="text-sm font-normal text-gray-400 bg-gray-700 px-3 py-1 rounded-full">
-                        {userData.trips?.length || 0}
+                        {journeys.length || 0}
                       </span>
                     </h2>
                     <Link
@@ -170,40 +227,52 @@ export default function Profile() {
                   </div>
 
                   <div className="space-y-4">
-                    {userData.trips && userData.trips.length > 0 ? (
-                      userData.trips.map((trip) => (
+                    {journeys.length > 0 ? (
+                      journeys.map((journey, journeyIndex) => {
+                        const firstSegment = journey[0];
+                        const lastSegment = journey[journey.length - 1];
+                        const journeyStart: [number, number] = [firstSegment.startStation.latitude, firstSegment.startStation.longitude];
+                        const journeyEnd: [number, number] = [lastSegment.endStation.latitude, lastSegment.endStation.longitude];
+                        return (
                         <div
                           className="bg-gray-900 border border-gray-700 rounded-xl p-6 transform transition-all duration-300 hover:scale-102 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/10"
-                          key={trip.id}
+                          key={`${firstSegment.id}-${lastSegment.id}-${journeyIndex}`}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                               <div className="text-2xl">📍</div>
                               <div>
                                 <p className="text-white font-semibold text-lg">
-                                  {trip.startStation.name} → {trip.endStation.name}
+                                  {firstSegment.startStation.name} → {lastSegment.endStation.name}
                                 </p>
                                 <p className="text-gray-400 text-sm">
-                                  {new Date(trip.tripDate).toLocaleDateString('en-US', {
+                                  {new Date(firstSegment.tripDate).toLocaleDateString('en-US', {
                                     weekday: 'short',
                                     year: 'numeric',
                                     month: 'short',
                                     day: 'numeric'
                                   })}
+                                  {journey.length > 1 ? ` • ${journey.length} segments` : ''}
                                 </p>
                               </div>
                             </div>
                             <div className="text-gray-500">→</div>
                           </div>
                           <Map 
-                            center={[(trip.startStation.latitude + trip.endStation.latitude) / 2, (trip.startStation.longitude + trip.endStation.longitude) / 2]} 
+                            center={[(journeyStart[0] + journeyEnd[0]) / 2, (journeyStart[1] + journeyEnd[1]) / 2]} 
                             zoom={13}
-
-                            startStationCoord={[trip.startStation.latitude, trip.startStation.longitude]}
-                            endStationCoord={[trip.endStation.latitude, trip.endStation.longitude]}
+                            startStationCoord={journeyStart}
+                            endStationCoord={journeyEnd}
+                            segments={journey.map((segment) => ({
+                              lineId: segment.line.id,
+                              lineName: segment.line.name,
+                              lineColor: segment.line.color,
+                              startStationCoord: [segment.startStation.latitude, segment.startStation.longitude] as [number, number],
+                              endStationCoord: [segment.endStation.latitude, segment.endStation.longitude] as [number, number],
+                            }))}
                           />
                         </div>
-                      ))
+                      )})
                     ) : (
                       <div className="text-center py-12">
                         <div className="text-6xl mb-4">🚇</div>
