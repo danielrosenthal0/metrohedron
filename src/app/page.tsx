@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import TopNavBar from "@/components/TopNavBar";
-import MapLine from "@/components/MapLine";
+
+const MapLine = dynamic(() => import("@/components/MapLine"), { ssr: false });
 
 export default function Home() {
   const [session, setSession] = useState<{ user?: { name?: string } } | null>(null);
@@ -104,12 +106,12 @@ export default function Home() {
                 </div>
                 
                 <div className="flex justify-center">
-                  <Link 
+                  <a 
                     href="/auth/login?prompt=login" 
                     className="inline-block bg-gradient-to-r from-blue-600 to-blue-500 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-lg transform transition-all duration-200 hover:scale-110 hover:shadow-blue-500/50 hover:from-blue-500 hover:to-blue-400 active:scale-95"
                   >
                     Get Started →
-                  </Link>
+                  </a>
                 </div>
               </div>
 
