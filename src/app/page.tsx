@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import TopNavBar from "@/components/TopNavBar";
+import BottomBar from "@/components/BottomBar";
 
 const MapLine = dynamic(() => import("@/components/MapLine"), { ssr: false });
 
@@ -138,6 +139,7 @@ export default function Home() {
           )}
         </div>
       </main>
+      <BottomBar/>
     </div>
   );
 }

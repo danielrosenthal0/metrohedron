@@ -1,5 +1,6 @@
 "use client";
 
+import BottomBar from "@/components/BottomBar";
 import TopNavBar from "@/components/TopNavBar";
 import { useEffect, useMemo, useState } from "react";
 
@@ -508,6 +509,7 @@ export default function LogTrip() {
           </div>
         </div>
       </main>
+      <BottomBar/>
 
       <AddTripModal
         isOpen={modalOpen}

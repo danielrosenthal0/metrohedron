@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 import dynamic from 'next/dynamic';
 import { Station } from "@prisma/client";
+import BottomBar from "@/components/BottomBar";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 interface Line {
@@ -350,6 +351,7 @@ export default function Profile() {
           </div>
         ) : null}
       </main>
+      <BottomBar/>
     </div>
   );
 }
