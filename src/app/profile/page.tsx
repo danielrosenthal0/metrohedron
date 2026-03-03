@@ -1,6 +1,8 @@
 "use client"
 
 import TopNavBar from "@/components/TopNavBar";
+import FriendsPanel from "@/components/FriendsPanel";
+import LeaderboardPanel from "@/components/LeaderboardPanel";
 import 'leaflet/dist/leaflet.css';
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
@@ -323,20 +325,13 @@ export default function Profile() {
                   </div>
                 </div>
 
+                {session.user.sub ? <FriendsPanel auth0Id={session.user.sub} /> : null}
+                {session.user.sub ? <LeaderboardPanel auth0Id={session.user.sub} /> : null}
+
                 <div className="flex justify-center">
                   <button
-                    onClick={async () => {
-                        try {
-                            const res = await fetch('/api/auth/logout', {
-                                method: 'POST',
-                                credentials: 'include'
-                            });
-                            if (res.ok) {
-                                window.location.href = '/';
-                            }
-                        } catch (error) {
-                            console.error('Logout failed:', error);
-                        }
+                    onClick={() => {
+                      window.location.href = '/auth/logout';
                     }}
                     className="text-white bg-gradient-to-r from-red-600 to-red-500 px-6 py-3 rounded-lg font-semibold shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-red-500/50 hover:from-red-500 hover:to-red-400 active:scale-95"
                 >

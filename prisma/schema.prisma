@@ -10,50 +10,61 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  auth0Id       String    @unique
-  email         String    @unique
-  name          String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  trips         Trip[]
-  favoriteLines Line[]
+  id                  String              @id @default(uuid())
+  auth0Id             String              @unique
+  email               String              @unique
+  name                String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  trips               Trip[]
+  favoriteLines       Line[]
+  outgoingFriendships Friendship[]        @relation("FriendshipRequester")
+  incomingFriendships Friendship[]        @relation("FriendshipAddressee")
+  rideStats           UserRideStats?
+  lineRideStats       UserLineRideStats[]
 }
 
 model Trip {
-  id            String    @id @default(uuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lineId        String
-  line          Line      @relation(fields: [lineId], references: [id])
-  startStationId  String
-  startStation  Station   @relation("TripStartStation", fields: [startStationId], references: [id])
-  endStationId  String
-  endStation    Station   @relation("TripEndStation", fields: [endStationId], references: [id])
-  tripDate      DateTime
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lineId         String
+  line           Line     @relation(fields: [lineId], references: [id])
+  startStationId String
+  startStation   Station  @relation("TripStartStation", fields: [startStationId], references: [id])
+  endStationId   String
+  endStation     Station  @relation("TripEndStation", fields: [endStationId], references: [id])
+  tripDate       DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@index([lineId])
+  @@index([tripDate])
+  @@index([userId, lineId])
+  @@index([userId, tripDate])
 }
 
 model Line {
-  id            String    @id @default(uuid())
-  name          String    @unique
+  id            String              @id @default(uuid())
+  name          String              @unique
   color         String
   trips         Trip[]
-  users         User[] 
+  users         User[]
   stations      Station[]
   lineShape     LineShape[]
+  lineRideStats UserLineRideStats[]
 }
 
 model Station {
-  id            String    @id @default(uuid())
-  name          String
-  borough       String
-  latitude      Float
-  longitude     Float
-  lines         Line[]
-  tripsAsStart  Trip[]    @relation("TripStartStation")
-  tripsAsEnd    Trip[]    @relation("TripEndStation")
+  id           String @id @default(uuid())
+  name         String
+  borough      String
+  latitude     Float
+  longitude    Float
+  lines        Line[]
+  tripsAsStart Trip[] @relation("TripStartStation")
+  tripsAsEnd   Trip[] @relation("TripEndStation")
 }
 
 model LineShape {
@@ -64,4 +75,57 @@ model LineShape {
   shapePointLongitude Float
   line                Line   @relation(fields: [lineId], references: [id])
   lineId              String
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+model Friendship {
+  id          String           @id @default(uuid())
+  requesterId String
+  addresseeId String
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  acceptedAt  DateTime?
+
+  requester User @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId, status])
+  @@index([addresseeId, status])
+}
+
+model UserRideStats {
+  userId       String    @id
+  totalRides   Int       @default(0)
+  lastRideAt   DateTime?
+  updatedAt    DateTime  @updatedAt
+  calculatedAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([totalRides])
+}
+
+model UserLineRideStats {
+  id           String    @id @default(uuid())
+  userId       String
+  lineId       String
+  rideCount    Int       @default(0)
+  lastRideAt   DateTime?
+  updatedAt    DateTime  @updatedAt
+  calculatedAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  line Line @relation(fields: [lineId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lineId])
+  @@index([lineId, rideCount])
+  @@index([userId, rideCount])
 }

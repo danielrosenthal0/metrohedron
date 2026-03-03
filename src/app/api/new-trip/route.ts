@@ -40,19 +40,84 @@ export async function POST(request: Request) {
       );
     }
 
-    const createdTrips = await prisma.$transaction(
-      tripInputs.map((item) =>
-        prisma.trip.create({
-          data: {
-            startStationId: item.startStationId,
-            endStationId: item.endStationId,
-            lineId: item.lineId,
-            tripDate: new Date(item.tripDate),
-            userId: user.id,
-          },
-        })
-      )
+    const parsedTrips = tripInputs.map((item) => ({
+      startStationId: item.startStationId,
+      endStationId: item.endStationId,
+      lineId: item.lineId,
+      tripDate: new Date(item.tripDate),
+      userId: user.id,
+    }));
+
+    const maxRideDate = parsedTrips.reduce(
+      (latest, item) => (item.tripDate > latest ? item.tripDate : latest),
+      parsedTrips[0].tripDate
     );
+
+    const lineCounts = parsedTrips.reduce<Record<string, { count: number; latestRide: Date }>>((acc, item) => {
+      const current = acc[item.lineId];
+      if (!current) {
+        acc[item.lineId] = { count: 1, latestRide: item.tripDate };
+        return acc;
+      }
+
+      acc[item.lineId] = {
+        count: current.count + 1,
+        latestRide: item.tripDate > current.latestRide ? item.tripDate : current.latestRide,
+      };
+      return acc;
+    }, {});
+
+    const createdTrips = await prisma.$transaction(async (tx) => {
+      const tripsCreated = await Promise.all(
+        parsedTrips.map((item) =>
+          tx.trip.create({
+            data: item,
+          })
+        )
+      );
+
+      await tx.userRideStats.upsert({
+        where: { userId: user.id },
+        update: {
+          totalRides: { increment: parsedTrips.length },
+          lastRideAt: maxRideDate,
+          calculatedAt: new Date(),
+        },
+        create: {
+          userId: user.id,
+          totalRides: parsedTrips.length,
+          lastRideAt: maxRideDate,
+          calculatedAt: new Date(),
+        },
+      });
+
+      await Promise.all(
+        Object.entries(lineCounts).map(([lineId, value]) =>
+          tx.userLineRideStats.upsert({
+            where: {
+              userId_lineId: {
+                userId: user.id,
+                lineId,
+              },
+            },
+            update: {
+              rideCount: { increment: value.count },
+              lastRideAt: value.latestRide,
+              calculatedAt: new Date(),
+            },
+            create: {
+              userId: user.id,
+              lineId,
+              rideCount: value.count,
+              lastRideAt: value.latestRide,
+              calculatedAt: new Date(),
+            },
+          })
+        )
+      );
+
+      return tripsCreated;
+    });
     
     return NextResponse.json(createdTrips);
   } catch (error) {
